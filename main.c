@@ -38,7 +38,7 @@ int main() {
   int user_input = getchar();
 
 if(user_input == 's'){
- if(x >= 1 && x<18){
+  if(x >= 1 && x<18){
   x +=1;
   }
 
