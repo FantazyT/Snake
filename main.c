@@ -2,10 +2,71 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <uv.h>
+#include <ncurses.h>
 
 static char input_buffer[128];
 
-void timer_cb(uv_timer_t *handle) { printf("Hello\n"); }
+
+#define CORPS_SNAKE '-';
+#define TETE_SNAKE 'B'
+#define NOURRITURE '*'
+#define CASE_VIDE ' '
+
+
+char ** grille = NULL;
+int nbLignes = 0;
+int nbColonnes = 0;
+int modeEvolueDansLequelLeSerpent = 0;
+
+struct uneCellule {
+  int ligne;
+  int colonne;
+  struct uneCellule * suiv;
+};
+typedef struct uneCellule uneCellule;
+
+struct unSnake {
+  uneCellule * teteSnake;
+  uneCellule * queueSnake;
+};
+typedef struct unSnake unSnake;
+
+struct uneDirection {
+  int ligne;
+  int colonne;
+};
+typedef struct uneDirection uneDirection;
+
+unSnake creerSnake() {
+
+  unSnake snake;
+
+  uneCellule * teteSnake = malloc(sizeof(uneCellule));
+  uneCellule * queueSnake = malloc(sizeof(uneCellule));
+  uneCellule * milieuSnake = malloc(sizeof(uneCellule));
+
+  teteSnake->ligne = 1;
+  teteSnake->colonne = 4;
+  teteSnake->suiv = NULL;
+
+  milieuSnake->ligne = 1;
+  milieuSnake->colonne = 3;
+  milieuSnake->suiv = teteSnake;
+
+  queueSnake->ligne = 1;
+  queueSnake->colonne = 2;
+  queueSnake->suiv = milieuSnake;
+
+  snake.teteSnake = teteSnake;
+  snake.queueSnake = queueSnake;
+
+  return snake;
+}
+ 
+ 
+
+
+void timer_cb(uv_timer_t *handle) { printf("hello"); }
 
 void alloc_cb(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
   buf->base = input_buffer;
@@ -36,29 +97,6 @@ int main() {
   uv_tty_set_mode(&input_tty, UV_TTY_MODE_RAW);
   input_tty.data = loop;
   int user_input = getchar();
-
-if(user_input == 's'){
-  if(x >= 1 && x<18){
-  x +=1;
-  }
-
-}
-if(user_input == 'z'){
-if(x >= 1 && x<18){
-x -=1;
-}
-}
-if(user_input == 'd'){
-if(y >= 1 && y<18){
-y +=1;
-}
-}
-if(user_input == 'q'){
-if(y >= 1 && y<18){
-y -=1;
-}
-}
-
 
   uv_read_start((uv_stream_t *)&input_tty, alloc_cb, read_cb);
 
